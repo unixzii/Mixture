@@ -76,11 +76,14 @@ class _SingletonComponentProvider: ComponentProvider {
     }
     
     override func provide(in container: ComponentContainer, typeMatcher: TypeMatcher) -> Any? {
-        if let cachedValue {
+        if let cachedValue, typeMatcher.isMatched(with: cachedValue) {
             return cachedValue
         }
-        cachedValue = provider.provide(in: container, typeMatcher: typeMatcher)
-        return cachedValue
+        let value = provider.provide(in: container, typeMatcher: typeMatcher)
+        if value != nil {
+            cachedValue = value
+        }
+        return value
     }
 }
 

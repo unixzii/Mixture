@@ -107,6 +107,9 @@ final class MixtureTests: XCTestCase {
         XCTAssertEqual(_Counter.fooCreationsCounter, 1)
         XCTAssertEqual(_Counter.barCreationsCounter, 1)
         
+        XCTAssertNotNil(container.tryGet() as Foo?)
+        XCTAssertEqual(_Counter.fooCreationsCounter, 1)
+        
         XCTAssertNotNil(container.tryGet() as Bar?)
         XCTAssertEqual(_Counter.fooCreationsCounter, 1)
         XCTAssertEqual(_Counter.barCreationsCounter, 2)
