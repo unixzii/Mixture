@@ -68,7 +68,7 @@ public class ComponentContainer: Hashable {
     /// Creates an instance with a graph.
     public init<G: ComponentGraph>(graph: G) {
         graphTypeMatcher = TypeMatcher(type: G.self)
-        graph.body.apply(to: self)
+        graph.apply(to: self)
     }
     
     public func hash(into hasher: inout Hasher) {
