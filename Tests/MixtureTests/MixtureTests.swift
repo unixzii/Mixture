@@ -68,7 +68,7 @@ final class MixtureTests: XCTestCase {
         let container = ComponentContainer(graph: SimpleComponentGraph())
         
         guard let bar: Bar = container.tryGet() else {
-            XCTExpectFailure("It should returns a `Bar` instance")
+            XCTFail("It should returns a `Bar` instance")
             return
         }
         
@@ -127,7 +127,7 @@ final class MixtureTests: XCTestCase {
         let container = ComponentContainer(graph: BindingTestComponentGraph())
         
         guard let bar: Bar = container.tryGet() else {
-            XCTExpectFailure("It should returns a `Bar` instance")
+            XCTFail("It should returns a `Bar` instance")
             return
         }
         
@@ -147,7 +147,7 @@ final class MixtureTests: XCTestCase {
         
         let barBuilder = AssistedInjectableComponent<Bar>(assistedParams: false)
         guard let bar = barBuilder.createInjectedComponent(with: fooContainer) else {
-            XCTExpectFailure("It should returns a `Bar` instance")
+            XCTFail("It should returns a `Bar` instance")
             return
         }
         
@@ -175,7 +175,7 @@ final class MixtureTests: XCTestCase {
         let barContainer = fooContainer.with { ComponentContainer(graph: BarComponentGraph()) }
         
         guard let bar: Bar = barContainer.tryGet() else {
-            XCTExpectFailure("It should returns a `Bar` instance")
+            XCTFail("It should returns a `Bar` instance")
             return
         }
         
@@ -203,7 +203,7 @@ final class MixtureTests: XCTestCase {
         let container = ComponentContainer(graph: MyTestComponentGraph())
         
         guard let bar: Bar = container.tryGet() else {
-            XCTExpectFailure("It should returns a `Bar` instance")
+            XCTFail("It should returns a `Bar` instance")
             return
         }
         
