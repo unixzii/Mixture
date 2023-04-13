@@ -79,7 +79,7 @@ public class ComponentContainer: Hashable {
     /// will abort if the dependency cannot be satisfied.
     public func `get`<T>() -> T {
         guard let value: T = tryGet() else {
-            fatalError("Cannot satisfy the dependency of `\(T.self)`")
+            preconditionFailure("Cannot satisfy the dependency of `\(T.self)`")
         }
         
         return value
@@ -123,7 +123,7 @@ public class ComponentContainer: Hashable {
 extension ComponentContainer {
     func addDependency<T: ComponentGraph>(_ depType: T.Type) {
         guard let container = Context.shared.container(of: depType) else {
-            fatalError("Cannot satisfy the dependency of `\(depType)`")
+            preconditionFailure("Cannot satisfy the dependency of `\(depType)`")
         }
         dependencyContainers.insert(container)
     }
