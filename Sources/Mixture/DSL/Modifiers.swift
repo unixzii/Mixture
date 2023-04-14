@@ -40,3 +40,9 @@ public extension ComponentGraph where Self: _Provider {
         Provides(provider: provider)
     }
 }
+
+public extension ComponentGraph {
+    func eraseToAnyComponentGraph() -> AnyComponentGraph {
+        .init(erasing: self)
+    }
+}

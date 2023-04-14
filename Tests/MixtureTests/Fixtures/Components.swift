@@ -55,3 +55,28 @@ class Baz: Bar {
         return (foo.fooBehavior(), false)
     }
 }
+
+class BasicTypeA: Injectable {
+    init() { }
+    required init(injectedWith container: ComponentContainer) { }
+}
+
+class BasicTypeB: Injectable {
+    init() { }
+    required init(injectedWith container: ComponentContainer) { }
+}
+
+class BasicTypeC: Injectable {
+    init() { }
+    required init(injectedWith container: ComponentContainer) { }
+}
+
+class BasicTypeD: Injectable {
+    init() { }
+    required init(injectedWith container: ComponentContainer) { }
+}
+
+class BasicTypeE: Injectable {
+    init() { }
+    required init(injectedWith container: ComponentContainer) { }
+}

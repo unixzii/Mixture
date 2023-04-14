@@ -41,3 +41,16 @@ public struct ComponentGraphPair<T1, T2>: ComponentGraph where T1: ComponentGrap
         second.apply(to: container)
     }
 }
+
+/// A component graph that collects multiple instances of graph type into a single unit.
+public struct ComponentGraphGroup<Content>: ComponentGraph where Content: ComponentGraph {
+    public let content: Content
+    
+    public var body: some ComponentGraph {
+        content
+    }
+    
+    public init(@ComponentGraphBuilder content: () -> Content) {
+        self.content = content()
+    }
+}
