@@ -11,7 +11,7 @@
 /// - Providing a value directly.
 /// - Lazily providing a value with injectable type.
 /// - Lazily providing a value with a builder, which can also inject dependencies.
-public struct Provides: ComponentGraph, _Provider {
+public struct Provides: ComponentGraph {
     public typealias Body = Never
     
     private class _ClosureComponentProvider<T>: ComponentProvider {
@@ -19,6 +19,10 @@ public struct Provides: ComponentGraph, _Provider {
         
         init(closure: @escaping (ComponentContainer, TypeMatcher) -> T?) {
             self.closure = closure
+        }
+        
+        override func canProvideValue(matched typeMatcher: TypeMatcher) -> Bool {
+            return typeMatcher.isMatched(with: T.self)
         }
         
         override func provide(in container: ComponentContainer, typeMatcher: TypeMatcher) -> Any? {
@@ -74,7 +78,11 @@ public struct Provides: ComponentGraph, _Provider {
     }
     
     public func apply(to container: ComponentContainer) {
-        container.addProvider(provider)
+        if container.modifier(of: _SingletonModifier.self) != nil {
+            container.addProvider(_SingletonComponentProvider(provider: provider))
+        } else {
+            container.addProvider(provider)
+        }
     }
 }
 
@@ -113,5 +121,94 @@ extension Provides {
             }
             return nil
         }
+    }
+}
+
+public extension ComponentGraph {
+    func singleton() -> some ComponentGraph {
+        return modifier(modifier: _SingletonModifier())
+    }
+    
+    func reusable(in scope: Scope) -> Never {
+        // TODO: TBD
+        fatalError("Not implemented")
+    }
+}
+
+fileprivate class _SingletonComponentManager {
+    static let shared = _SingletonComponentManager()
+    
+    private var records = [Record]()
+    
+    private struct Record {
+        let value: Any
+        let graphTypeMatcher: TypeMatcher
+    }
+    
+    func addValue(_ value: Any, inGraphMatched graphTypeMatcher: TypeMatcher) {
+        records.append(.init(value: value, graphTypeMatcher: graphTypeMatcher))
+    }
+    
+    func value(matched typeMatcher: TypeMatcher, inGraph graph: Any) -> Any? {
+        for record in records {
+            guard record.graphTypeMatcher.isMatched(with: graph) else {
+                continue
+            }
+            
+            let value = record.value
+            if typeMatcher.isMatched(with: value) {
+                return value
+            }
+        }
+        return nil
+    }
+}
+
+fileprivate class _SingletonComponentProvider: ComponentProvider {
+    let provider: ComponentProvider
+    var cachedValue: Any?
+    
+    init(provider: ComponentProvider) {
+        self.provider = provider
+    }
+    
+    override func provide(in container: ComponentContainer, typeMatcher: TypeMatcher) -> Any? {
+        // Fetch the value from our local cache.
+        if let cachedValue, typeMatcher.isMatched(with: cachedValue) {
+            return cachedValue
+        }
+        
+        // Not hit the cache, try fetching from singleton manager.
+        //
+        // Before fetching from singleton manager, we must check whether
+        // this provider can provide the requested value. For example,
+        // if we are requesting a `Foo` value, and it's already existed
+        // in singleton manager, then the value will be returned. However,
+        // bad things will happen if the callee provider should provide
+        // `Bar` values, we may cache the wrong value!
+        guard provider.canProvideValue(matched: typeMatcher) else {
+            return nil
+        }
+        
+        let manager = _SingletonComponentManager.shared
+        if let value = manager.value(matched: typeMatcher, inGraph: container.graph) {
+            cachedValue = value
+            return value
+        }
+        
+        // First time to access the value, fetch it from the upstream provider.
+        // Then store it both to the local cache and singleton manager.
+        let value = provider.provide(in: container, typeMatcher: typeMatcher)
+        if let value {
+            cachedValue = value
+            manager.addValue(value, inGraphMatched: container.graphTypeMatcher)
+        }
+        return value
+    }
+}
+
+fileprivate struct _SingletonModifier: ComponentGraphModifier {
+    func body(content: Content) -> some ComponentGraph {
+        content
     }
 }

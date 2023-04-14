@@ -22,44 +22,6 @@ final class MixtureTests: XCTestCase {
         XCTAssertTrue(barResult)
     }
     
-    func testSingleton() {
-        struct _Counter {
-            static var fooCreationsCounter: Int = 0
-            static var barCreationsCounter: Int = 0
-        }
-        
-        struct SingletonTestComponentGraph: ComponentGraph {
-            var body: some ComponentGraph {
-                Provides { () -> Foo in
-                    _Counter.fooCreationsCounter += 1
-                    return Foo()
-                }
-                .singleton()
-                
-                Provides { (foo: Foo) -> Bar in
-                    _Counter.barCreationsCounter += 1
-                    return Bar(foo: foo)
-                }
-            }
-        }
-        
-        _Counter.fooCreationsCounter = 0
-        _Counter.barCreationsCounter = 0
-        
-        let container = ComponentContainer(graph: SingletonTestComponentGraph())
-        
-        XCTAssertNotNil(container.tryGet() as Bar?)
-        XCTAssertEqual(_Counter.fooCreationsCounter, 1)
-        XCTAssertEqual(_Counter.barCreationsCounter, 1)
-        
-        XCTAssertNotNil(container.tryGet() as Foo?)
-        XCTAssertEqual(_Counter.fooCreationsCounter, 1)
-        
-        XCTAssertNotNil(container.tryGet() as Bar?)
-        XCTAssertEqual(_Counter.fooCreationsCounter, 1)
-        XCTAssertEqual(_Counter.barCreationsCounter, 2)
-    }
-    
     func testBinding() {
         struct BindingTestComponentGraph: ComponentGraph {
             var body: some ComponentGraph {

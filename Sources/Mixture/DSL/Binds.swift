@@ -19,6 +19,10 @@ public struct Binds<T, S>: ComponentGraph where S: Injectable {
             self.sourceType = sourceType
         }
         
+        override func canProvideValue(matched typeMatcher: TypeMatcher) -> Bool {
+            return typeMatcher.isMatched(with: T.self)
+        }
+        
         override func provide(in container: ComponentContainer, typeMatcher: TypeMatcher) -> Any? {
             if typeMatcher.isMatched(with: T.self) {
                 return sourceType.init(injectedWith: container)

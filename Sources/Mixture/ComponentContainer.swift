@@ -57,6 +57,7 @@ extension Never: ComponentGraph {
 /// that the given graph describes. Users can retrieve or inject components from
 /// this container.
 public class ComponentContainer: Hashable {
+    let graph: Any
     let graphTypeMatcher: TypeMatcher
     private var dependencyContainers = Set<ComponentContainer>()
     private var providers = Set<ComponentProvider>()
@@ -68,6 +69,7 @@ public class ComponentContainer: Hashable {
     
     /// Creates an instance with a graph.
     public init<G: ComponentGraph>(graph: G) {
+        self.graph = graph
         graphTypeMatcher = TypeMatcher(type: G.self)
         graph.apply(to: self)
     }
@@ -157,6 +159,10 @@ public class ComponentProvider: Hashable {
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
+    }
+    
+    func canProvideValue(matched typeMatcher: TypeMatcher) -> Bool {
+        return true
     }
     
     func provide(in container: ComponentContainer, typeMatcher: TypeMatcher) -> Any? {
