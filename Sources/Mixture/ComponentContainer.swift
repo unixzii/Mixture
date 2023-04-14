@@ -60,6 +60,7 @@ public class ComponentContainer: Hashable {
     let graphTypeMatcher: TypeMatcher
     private var dependencyContainers = Set<ComponentContainer>()
     private var providers = Set<ComponentProvider>()
+    private var modifierStack = [Any]()
     
     public static func == (lhs: ComponentContainer, rhs: ComponentContainer) -> Bool {
         return lhs === rhs
@@ -130,6 +131,22 @@ extension ComponentContainer {
     
     func addProvider(_ provider: ComponentProvider) {
         providers.insert(provider)
+    }
+    
+    func withModifier<T: ComponentGraphModifier, R>(_ modifier: T, _ action: () -> R) -> R {
+        modifierStack.append(modifier)
+        let value = action()
+        let _ = modifierStack.popLast()
+        return value
+    }
+    
+    func modifier<T: ComponentGraphModifier>(of type: T.Type) -> T? {
+        for modifier in modifierStack.reversed() {
+            if let castedModifier = modifier as? T {
+                return castedModifier
+            }
+        }
+        return nil
     }
 }
 
