@@ -8,7 +8,7 @@
 import XCTest
 @testable import Mixture
 
-final class DSLTests: XCTestCase {
+final class UtilityTypeTests: XCTestCase {
     func testAnyComponentGraph() {
         struct MyComponentGraph: ComponentGraph {
             var body: some ComponentGraph {
