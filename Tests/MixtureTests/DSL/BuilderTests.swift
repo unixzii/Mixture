@@ -57,4 +57,23 @@ final class BuilderTests: XCTestCase {
         let _ = ComponentContainer(graph: MyComponentGraph4())
         let _ = ComponentContainer(graph: MyComponentGraph5())
     }
+    
+    func testBuildBlockWithAnyComponentGraphs() {
+        struct MyComponentGraph: ComponentGraph {
+            var body: some ComponentGraph {
+                // Instantiate graph items more than static-typed `buildBlock` supports.
+                EmptyComponentGraph().eraseToAnyComponentGraph()
+                EmptyComponentGraph().eraseToAnyComponentGraph()
+                EmptyComponentGraph().eraseToAnyComponentGraph()
+                EmptyComponentGraph().eraseToAnyComponentGraph()
+                EmptyComponentGraph().eraseToAnyComponentGraph()
+                EmptyComponentGraph().eraseToAnyComponentGraph()
+                EmptyComponentGraph().eraseToAnyComponentGraph()
+                EmptyComponentGraph().eraseToAnyComponentGraph()
+            }
+        }
+        
+        // It should compile without errors.
+        let _ = ComponentContainer(graph: MyComponentGraph())
+    }
 }

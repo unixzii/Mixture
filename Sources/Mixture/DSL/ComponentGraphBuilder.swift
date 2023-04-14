@@ -30,4 +30,11 @@ extension ComponentGraphBuilder {
     public static func buildBlock<E1, E2, E3, E4, E5>(_ e1: E1, _ e2: E2, _ e3: E3, _ e4: E4, _ e5: E5) -> ComponentGraphPair<E1, ComponentGraphPair<E2, ComponentGraphPair<E3, ComponentGraphPair<E4, E5>>>> {
         return .init(first: e1, second: .init(first: e2, second: .init(first: e3, second: .init(first: e4, second: e5))))
     }
+    
+    public static func buildBlock(_ graphs: AnyComponentGraph...) -> AnyComponentGraph {
+        let firstGraph = graphs.first!
+        return graphs.dropFirst().reduce(firstGraph) { partialResult, currentGraph in
+            AnyComponentGraph(erasing: ComponentGraphPair(first: partialResult, second: currentGraph))
+        }
+    }
 }
