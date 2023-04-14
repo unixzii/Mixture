@@ -10,13 +10,6 @@ import XCTest
 
 final class MixtureTests: XCTestCase {
     func testSimple() {
-        struct SimpleComponentGraph: ComponentGraph {
-            var body: some ComponentGraph {
-                Provides(value: Foo())
-                Provides(type: Bar.self)
-            }
-        }
-        
         let container = ComponentContainer(graph: SimpleComponentGraph())
         
         guard let bar: Bar = container.tryGet() else {
